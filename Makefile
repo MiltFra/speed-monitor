@@ -2,7 +2,7 @@ BUILD_DIR = ./build
 SRC_DIR = ./src
 DATA_DIR = ./data
 
-PY = /usr/bin/python
+PY = /usr/bin/python3
 
 .PHONY: all
 all: setup run
