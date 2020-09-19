@@ -1,4 +1,4 @@
-# Network Data Collection
+# Internet Speed Data Collection
 
 To use this program, run
 
