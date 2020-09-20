@@ -9,7 +9,6 @@ import datetime
 
 SPEEDTEST_PATH = sys.argv[1]
 OUTPUT_DIR = sys.argv[2]
-DELAY = 300
 
 
 def server_file():
@@ -33,18 +32,33 @@ def get_servers():
 
 
 def speedtest(f, server):
-    print(f"-- ID: {server}...", end='')
+    print(f"ID: {server}...", end='', flush=True)
     start = time.time_ns()
-    out = check_output([SPEEDTEST_PATH, "-f", "csv", "-s",
-                        server]).decode("utf-8")
+    p = Popen([SPEEDTEST_PATH, "-f", "csv", "-s", server],
+              stdout=PIPE,
+              stderr=PIPE)
+    try:
+        out, err = p.communicate(timeout=60)
+    except TimeoutError:
+        print("TIMEOUT")
+        return
     end = time.time_ns()
-    out = f"{out.strip()}, {start}, {end}"
-    subprocess.run(["echo", out], stdout=f)  # echoing to get immediate results
-    print(f"Done ({end-start}ns)")
+    if err:
+        print("ERROR, Message:")
+        print(err.decode("utf-8"))
+        return
+    else:
+        out = f"{out.strip()}, {start}, {end}"
+        subprocess.run(["echo", out],
+                       stdout=f)  # echoing to get immediate results
+        print(f"DONE, Time: {(end-start)/1000000000:.2f}s")
+        return
 
 
 def speedtest_list(f, server_list):
-    for server in server_list:
+    l = len(server_list)
+    for i, server in enumerate(server_list):
+        print(f"{i+1}/{l} ", end=' ')
         speedtest(f, server)
 
 
@@ -53,7 +67,7 @@ def out_file():
 
 
 def pretty_time():
-    return datetime.datetime.now().time()
+    return datetime.datetime.now().time().isoformat(timespec="seconds")
 
 
 def run():
