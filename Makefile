@@ -10,9 +10,12 @@ all: setup run
 $(BUILD_DIR)/speedtest:
 	$(SRC_DIR)/setup.sh $(BUILD_DIR)
 
+.PHONY: build
+build: $(BUILD_DIR)/speedtest
+
 .PHONY: run
-run: $(BUILD_DIR)/speedtest
-	$(PY) $(SRC_DIR)/network_monitor.py $(BUILD_DIR)/speedtest $(DATA_DIR)
+run: build
+	$(PY) $(SRC_DIR)/main.py $(BUILD_DIR)/speedtest $(DATA_DIR)
 
 .PHONY: clean
 clean:
